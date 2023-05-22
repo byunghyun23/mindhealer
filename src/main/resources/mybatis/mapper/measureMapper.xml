@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.example.demo.mapper.MeasureMapper">
+    <select id="selectData" parameterType="hashMap" resultType="hashMap">
+      SELECT 
+         *
+      FROM (
+         SELECT 
+            survey.id AS survey_id, 
+            users.id AS user_id, 
+            users.name, users.gender, 
+            users.region, 
+            ROUND((TO_DAYS(NOW()) - (TO_DAYS(DATE_FORMAT(users.birthday, '%Y-%m-%d')))) / 365) AS age,
+            survey.score,
+            survey.type,
+            survey.updated_at AS update_dt,
+            MONTH(survey.updated_at) AS month
+         FROM 
+            survey, users
+         WHERE
+             1=1
+            AND survey.user_id = users.id
+            AND (users.region IS NOT NULL AND users.region != '')
+            AND (users.birthday IS NOT NULL)
+         ) AS measure
+      WHERE
+         1=1
+         <if test="name != null">
+         	AND measure.name = #{name}
+         </if>
+         <if test="gender != null">
+         	AND measure.gender = #{gender}
+         </if>
+         <if test="region != null">
+         	AND measure.region = #{region}
+         </if>
+         <if test="type != null">
+         	AND measure.type = #{type}
+         </if>
+         <if test="startAge != null">
+         	<![CDATA[AND measure.age >= #{startAge}]]>
+         </if>
+         <if test="endAge != null">
+         	<![CDATA[AND measure.age <= #{endAge}]]>
+         </if>
+         <if test="year != null">
+         	<![CDATA[AND YEAR(measure.update_dt) = ${year}]]>
+         </if>
+    </select>
+    
+    <select id="selectOverview" parameterType="hashMap" resultType="hashMap">
+    
+      SELECT 
+         month, (sum(measure.score) / count(*)) AS cnt
+      FROM (
+         SELECT 
+            survey.id AS survey_id, 
+            users.id AS user_id, 
+            users.name, users.gender, 
+            users.region, 
+            ROUND((TO_DAYS(NOW()) - (TO_DAYS(DATE_FORMAT(users.birthday, '%Y-%m-%d')))) / 365) AS age,
+            survey.score,
+            survey.type,
+            survey.updated_at AS update_dt,
+            MONTH(survey.updated_at) AS month
+         FROM 
+            survey, users
+         WHERE
+             1=1
+            AND survey.user_id = users.id
+            AND (users.region IS NOT NULL AND users.region != '')
+            AND (users.birthday IS NOT NULL)
+         ) AS measure
+      WHERE
+         1=1
+         <![CDATA[AND measure.update_dt > DATE('2020-01-01')]]>
+         <![CDATA[AND measure.update_dt < DATE('2020-12-31')]]>
+         
+         <if test="startAge != null">
+         	<![CDATA[AND measure.age >= #{startAge}]]>
+         </if>
+         <if test="endAge != null">
+         	<![CDATA[AND measure.age <= #{endAge}]]>
+         </if>
+         <if test="gender != null">
+         	<![CDATA[AND measure.gender = #{gender}]]>
+         </if>
+         <if test="region != null">
+         	<![CDATA[AND measure.region = #{region}]]>
+         </if>
+         <if test="type != null">
+         	<![CDATA[AND measure.type = #{type}]]>
+         </if>
+      GROUP BY month
+    </select>
+    
+    <select id="selectMap" parameterType="hashMap" resultType="hashMap">
+    
+      SELECT 
+         region, (sum(measure.score) / count(*)) AS cnt
+      FROM (
+         SELECT 
+            survey.id AS survey_id, 
+            users.id AS user_id, 
+            users.name, users.gender, 
+            users.region, 
+            ROUND((TO_DAYS(NOW()) - (TO_DAYS(DATE_FORMAT(users.birthday, '%Y-%m-%d')))) / 365) AS age,
+            survey.score,
+            survey.type,
+            survey.updated_at AS update_dt,
+            MONTH(survey.updated_at) AS month
+         FROM 
+            survey, users
+         WHERE
+             1=1
+            AND survey.user_id = users.id
+            AND (users.region IS NOT NULL AND users.region != '')
+            AND (users.birthday IS NOT NULL)
+         ) AS measure
+      WHERE
+         1=1
+         <if test="startAge != null">
+         	<![CDATA[AND measure.age >= #{startAge}]]>
+         </if>
+         <if test="endAge != null">
+         	<![CDATA[AND measure.age <= #{endAge}]]>
+         </if>
+         <if test="gender != null">
+         	<![CDATA[AND measure.gender = #{gender}]]>
+         </if>
+         <if test="type != null">
+         	<![CDATA[AND measure.type = #{type}]]>
+         </if>
+      GROUP BY region
+    </select>
+    
+    
+    
+    <select id="selectInfo" parameterType="hashMap" resultType="hashMap">    
+	      SELECT 
+	         avg(score) as avg
+	      FROM (
+	         SELECT 
+	            survey.id AS survey_id, 
+	            users.id AS user_id, 
+	            users.name, users.gender, 
+	            users.region, 
+	            ROUND((TO_DAYS(NOW()) - (TO_DAYS(DATE_FORMAT(users.birthday, '%Y-%m-%d')))) / 365) AS age,
+	            survey.score,
+	            survey.type,
+	            survey.updated_at AS update_dt,
+	            MONTH(survey.updated_at) AS month
+	         FROM 
+	            survey, users
+	         WHERE
+	             1=1
+	            AND survey.user_id = users.id
+	            AND (users.region IS NOT NULL AND users.region != '')
+	            AND (users.birthday IS NOT NULL)
+	         ) AS measure
+			where 
+			1=1
+         <if test="startAge != null">
+         	<![CDATA[AND measure.age >= #{startAge}]]>
+         </if>
+         <if test="endAge != null">
+         	<![CDATA[AND measure.age <= #{endAge}]]>
+         </if>
+         <if test="gender != null">
+         	<![CDATA[AND measure.gender = #{gender}]]>
+         </if>
+         <if test="region != null">
+         	<![CDATA[AND measure.region = #{region}]]>
+         </if>
+         <if test="type != null">
+         	<![CDATA[AND measure.type = #{type}]]>
+         </if>
+    </select>
+    
+</mapper>
