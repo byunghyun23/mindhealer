@@ -1,7 +1,7 @@
 # Mind Healer Data Visualization Dashboard
 
 * DDL(Data Definition Language) is not provided.
-* 
+
 ![image](https://github.com/byunghyun23/mindhealer/blob/main/mindhealer_web_home.PNG)
 
 ## Try
